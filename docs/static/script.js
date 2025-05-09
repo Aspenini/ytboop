@@ -21,17 +21,32 @@ function sendToYTBoop() {
   const type = document.getElementById("type").value;
   const format = document.getElementById("format").value;
   const status = document.getElementById("status");
+
+  // Try to auto-launch the backend app if path is saved
+  const savedPath = localStorage.getItem("ytboopAppPath");
+  if (savedPath) {
+    fetch("file://" + savedPath).catch(() => {});
+  }
+
   fetch("http://localhost:5000/download", {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ url, type, format })
   }).then(r => {
     if (r.ok) {
-      status.textContent = "Download started! Check your Downloads folder.";
+      status.textContent = "Download started! Check your Downloads/YTBoop folder.";
     } else {
-      status.textContent = "Failed to download.";
+      status.textContent = "Download failed. Check the console.";
     }
   }).catch(() => {
     status.textContent = "YTBoop is not running.";
   });
+}
+
+function savePath() {
+  const path = prompt("Paste full path to the YTBoop app executable (ytboop_launcher.exe):");
+  if (path) {
+    localStorage.setItem("ytboopAppPath", path);
+    alert("Path saved!");
+  }
 }

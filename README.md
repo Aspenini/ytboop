@@ -1,2 +1,2 @@
-# YTBoop Backend
-Run this Flask app locally to power the YTBoop frontend.
+# YTBoop Backend v5
+Handles downloading and converting YouTube media with optional cookie support.
