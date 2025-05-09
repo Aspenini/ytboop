@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>YTBoop</title>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; background: #1a1a1a; color: #eee; padding: 2rem; }
+    input, select, button { display: block; margin-top: 1rem; padding: 0.5rem; width: 100%; max-width: 400px; }
+    button { background: #28a745; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>YTBoop YouTube Downloader</h1>
+  <div id="status">Checking for YTBoop app...</div>
+  <input type="text" id="url" placeholder="Paste YouTube URL" />
+  <select id="type">
+    <option value="audio">Audio</option>
+    <option value="video">Video</option>
+  </select>
+  <select id="format">
+    <option value="mp3">MP3</option>
+    <option value="mp4">MP4</option>
+    <option value="webm">WebM</option>
+    <option value="wav">WAV</option>
+  </select>
+  <button onclick="sendToYTBoop()">Download with YTBoop</button>
+
+  <script>
+    async function waitForYTBoop() {
+      const status = document.getElementById("status");
+      for (let i = 0; i < 15; i++) {
+        try {
+          const res = await fetch("http://localhost:5000/ping");
+          if (res.ok) {
+            status.textContent = "YTBoop is running!";
+            return;
+          }
+        } catch (e) {}
+        status.textContent = "Waiting for YTBoop to launch... (" + (15 - i) + "s)";
+        await new Promise(r => setTimeout(r, 1000));
+      }
+      status.textContent = "YTBoop not found. Please open the app manually.";
+    }
+
+    waitForYTBoop();
+
+    function sendToYTBoop() {
+      const url = document.getElementById("url").value;
+      const type = document.getElementById("type").value;
+      const format = document.getElementById("format").value;
+      fetch("http://localhost:5000/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ url, type, format })
+      }).then(r => {
+        if (r.ok) alert("Download started!");
+        else alert("Something went wrong.");
+      }).catch(() => alert("YTBoop not running."));
+    }
+  </script>
+</body>
+</html>
