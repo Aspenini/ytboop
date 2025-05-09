@@ -1,2 +1,2 @@
-# Frontend for YTBoop
-This folder is deployed to GitHub Pages.
+# YTBoop Frontend
+This folder is served on GitHub Pages.

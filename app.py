@@ -1,21 +1,17 @@
-from flask import Flask, request
+from flask import Flask, request, send_file
 from flask_cors import CORS
 import subprocess
 import os
 import urllib.parse
-import json
+import uuid
+import shutil
 
 app = Flask(__name__)
 CORS(app)
 
-DOWNLOADS_DIR = "downloads"
-CONFIG_PATH = os.path.expanduser("~/.ytboop")
+# Path to user's Downloads folder
+DOWNLOADS_DIR = os.path.join(os.path.expanduser("~"), "Downloads", "YTBoop")
 os.makedirs(DOWNLOADS_DIR, exist_ok=True)
-os.makedirs(CONFIG_PATH, exist_ok=True)
-
-# Write active flag
-with open(os.path.join(CONFIG_PATH, "active.json"), "w") as f:
-    json.dump({"status": "running"}, f)
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -30,16 +26,24 @@ def download():
     if not url or not media_type or not format_:
         return "Missing parameters", 400
 
-    output_path = os.path.join(DOWNLOADS_DIR, 'output.%(ext)s')
-    cmd = ['yt-dlp', '-o', output_path, url]
+    # Use a random filename
+    base_filename = f"ytboop_{uuid.uuid4().hex}"
+    temp_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.temp")
+    final_path = os.path.join(DOWNLOADS_DIR, f"{base_filename}.{format_}")
 
-    if media_type == 'audio':
-        cmd += ['-x', '--audio-format', format_]
-    else:
-        cmd += ['-f', f'bestvideo[ext={format_}]+bestaudio/best']
+    # Download best format using yt-dlp
+    download_cmd = ['yt-dlp', '-f', 'best', '-o', temp_path, url]
+    subprocess.run(download_cmd)
 
-    subprocess.run(cmd)
-    return "Download started", 200
+    # Convert using ffmpeg
+    convert_cmd = ['ffmpeg', '-y', '-i', temp_path, final_path]
+    subprocess.run(convert_cmd)
+
+    # Remove temp file
+    if os.path.exists(temp_path):
+        os.remove(temp_path)
+
+    return send_file(final_path, as_attachment=True)
 
 if __name__ == '__main__':
     app.run(port=5000)

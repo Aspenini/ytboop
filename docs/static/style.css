@@ -1,0 +1,39 @@
+body {
+  background: #0e0e0e;
+  font-family: 'Segoe UI', sans-serif;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  margin: 0;
+}
+.container {
+  background: #1c1c1c;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 15px #00ff99;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+}
+input, select, button {
+  width: 100%;
+  padding: 0.6rem;
+  margin: 0.5rem 0;
+  border: none;
+  border-radius: 0.5rem;
+}
+button {
+  background: #00ff99;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #00cc7a;
+}
+.desc {
+  opacity: 0.8;
+}
